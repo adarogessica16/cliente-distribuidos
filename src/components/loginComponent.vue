@@ -1,4 +1,3 @@
-
 <template>
     <form @submit.prevent="handleLogin">
         <div class="mb-3">
@@ -14,8 +13,7 @@
 </template>
 
 <script>
-// Importar Axios
-import axios from 'axios';
+import authService from '@/services/authService';
 
 export default {
     name: "LoginComponent",
@@ -28,15 +26,13 @@ export default {
     methods: {
         async handleLogin() {
             try {
-                const response = await axios.post('/auth/login', {
-                    username: this.username,
-                    contraseña: this.password,
-                });
+                // Llamada a authService para el inicio de sesión
+                await authService.login(this.username, this.password);
 
-                localStorage.setItem("token", response.data.token);
+                // Redirigir a la página de inicio
                 this.$router.push({ name: "Home" });
             } catch (error) {
-                alert(error.response?.data?.message || "Error en el inicio de sesión");
+                alert(error.message || "Error en el inicio de sesión");
             }
         },
     },

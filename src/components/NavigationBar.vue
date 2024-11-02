@@ -1,69 +1,33 @@
-<!-- NavBar.vue -->
+<!-- src/components/NavBar.vue -->
 <template>
-    <b-navbar toggleable="lg" type="dark" variant="info">
-        <b-container>
-            <b-navbar-brand to="/">Mi Aplicación</b-navbar-brand>
-            <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-            <b-collapse id="nav-collapse" is-nav>
-                <!-- Botón desplegable de Categorías -->
-                <b-navbar-nav>
-                    <b-nav-item-dropdown text="Categorías" right>
-                        <template #button-content>
-                            Categorías
-                        </template>
-                        <b-dropdown-item
-                            v-for="categoria in categorias"
-                            :key="categoria.id"
-                            :to="`/categoria/${categoria.id}`"
-                        >
-                            {{ categoria.nombre }}
-                        </b-dropdown-item>
-                    </b-nav-item-dropdown>
-                </b-navbar-nav>
-                <!-- Opción de Cerrar Sesión -->
-                <b-navbar-nav class="ml-auto" v-if="isAuthenticated">
-                    <b-nav-item @click="logout">Cerrar sesión</b-nav-item>
-                </b-navbar-nav>
-            </b-collapse>
-        </b-container>
+    <b-navbar toggleable="lg" type="dark" variant="dark">
+        <b-navbar-brand to="/">Mi Aplicación</b-navbar-brand>
+        <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+        <b-collapse id="nav-collapse" is-nav>
+            <b-navbar-nav>
+                <b-nav-item to="/" exact>Inicio</b-nav-item>
+                <b-nav-item to="/categorias">Categorías</b-nav-item>
+                <b-nav-item v-if="!isAuthenticated" to="/login">Iniciar Sesión</b-nav-item>
+            </b-navbar-nav>
+            <b-navbar-nav class="ml-auto">
+                <b-nav-item v-if="isAuthenticated" @click="handleLogout">Cerrar Sesión</b-nav-item>
+            </b-navbar-nav>
+        </b-collapse>
     </b-navbar>
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
-    name: 'NavigationBar',
-    props: {
-        isAuthenticated: {
-            type: Boolean,
-            required: true
-        }
-    },
-    data() {
-        return {
-            categorias: []
-        }
-    },
-    created() {
-        this.fetchCategorias()
+    computed: {
+        isAuthenticated() {
+            return !!localStorage.getItem('token');
+        },
     },
     methods: {
-        async fetchCategorias() {
-            try {
-                const response = await axios.get('/api/categorias')
-                this.categorias = response.data
-            } catch (error) {
-                console.error('Error al obtener las categorías:', error)
-            }
+        handleLogout() {
+            localStorage.removeItem('token');
+            this.$router.push({ name: 'Login' });
         },
-        logout() {
-            localStorage.removeItem('token')
-            this.$emit('logout')
-        }
-    }
-}
+    },
+};
 </script>
-
-
-
