@@ -9,7 +9,11 @@ module.exports = defineConfig({
         target: 'http://localhost:8040',
         changeOrigin: true,
       },
-      '/api/categorias': {
+      '/api': {
+        target: 'http://localhost:8040',
+        changeOrigin: true,
+      },
+      '/api/pedidos': {
         target: 'http://localhost:8040',
         changeOrigin: true,
       },
@@ -20,7 +24,7 @@ module.exports = defineConfig({
       new webpack.DefinePlugin({
         __VUE_OPTIONS_API__: true,
         __VUE_PROD_DEVTOOLS__: false,
-        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false), // Flag necesaria para Vue esm-bundler
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false), 
       }),
     ],
   },

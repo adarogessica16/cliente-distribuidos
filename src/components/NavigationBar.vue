@@ -1,12 +1,14 @@
 <!-- src/components/NavBar.vue -->
 <template>
-    <b-navbar toggleable="lg" type="dark" variant="dark">
+    <b-navbar toggleable="lg" type="light" variant="primary">
         <b-navbar-brand to="/">Mi Aplicación</b-navbar-brand>
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
         <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav>
                 <b-nav-item to="/" exact>Inicio</b-nav-item>
                 <b-nav-item to="/categorias">Categorías</b-nav-item>
+                <b-nav-item to="/pedidos">Carrito</b-nav-item>
+                <b-nav-item to="/obtener-pedidos">Pedidos</b-nav-item>
                 <b-nav-item v-if="!isAuthenticated" to="/login">Iniciar Sesión</b-nav-item>
             </b-navbar-nav>
             <b-navbar-nav class="ml-auto">
