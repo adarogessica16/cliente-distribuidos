@@ -8,6 +8,7 @@ import PedidoLista from '@/components/listaPedidos.vue'
 import ProductoDetalle from '@/components/Producto/ProductoDetalle.vue';
 import ProductoList from '@/components/Producto/ProductoList.vue';
 import CategoriaList from '@/components/Categoria/CategoriaList.vue';
+import ReseñasForm from '@/components/Reseñas/ReseñasForm.vue';
 
 const routes = [
   {
@@ -55,7 +56,14 @@ const routes = [
   {
     path: '/crear-pedido',
     name: 'CrearPedido',
-    component: PedidoForm
+    component: PedidoForm,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/crear-reseña/:idProducto',
+    name: 'CrearReseña',
+    component: ReseñasForm,
+    meta: { requiresAuth: true }
   }
   
 ];

@@ -21,6 +21,8 @@
             </b-card>
 
             <b-button variant="primary" @click="$router.push('/productos')">Volver a Productos</b-button>
+            <b-button variant="primary" @click="valorarProducto(producto.id)">Valorar</b-button>
+
         </div>
         
         <b-alert v-if="error" variant="danger" dismissible @dismissed="error = null">
@@ -89,6 +91,9 @@ export default {
         handleError(error, mensajePredeterminado) {
             console.error('Error:', error);
             this.error = error.response?.data?.message || mensajePredeterminado;
+        },
+        valorarProducto(idProducto) {
+            this.$router.push({ name: 'CrearReseña', params: { idProducto: idProducto } });
         }
     }
 };

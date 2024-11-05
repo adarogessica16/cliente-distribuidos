@@ -1,7 +1,7 @@
 <!-- src/components/NavBar.vue -->
 <template>
-    <b-navbar toggleable="lg" type="light" variant="primary">
-        <b-navbar-brand to="/">Mi Aplicación</b-navbar-brand>
+    <b-navbar toggleable="lg" type="light" variant="Light" class="navbar-custom-width , navbar-custom-height ">
+        <b-navbar-brand to="/">Ñande-commerce</b-navbar-brand>
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
         <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav>
@@ -33,3 +33,13 @@ export default {
     },
 };
 </script>
+<style>
+.navbar-custom-width {
+    width: 90%; /* O cualquier otro ancho que prefieras */
+    margin: 0 auto; /* Centrar el navbar si no ocupa el 100% */
+}
+.navbar-custom-height {
+    height: 100px; /* Ajusta el valor según tus necesidades */
+    line-height: 100px; /* Alinea el contenido verticalmente */
+}
+</style>

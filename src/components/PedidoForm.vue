@@ -51,32 +51,7 @@ export default {
             error: null
         };
     },
-    created() {
-      
-        this.obtenerIdUsuario();
-    },
     methods: {
-        async obtenerIdUsuario() {
-            const token = localStorage.getItem('token');
-            console.log(token)
-            if (token) {
-                try {
-          
-            const payload = JSON.parse(atob(token.split('.')[1]));
-
-           
-            if ('id' in payload) {
-                this.pedido.id_Usuario = payload.id;
-            } else {
-                console.warn('El campo Id no existe en el token.');
-                this.error = 'El token no contiene información de usuario válida.';
-            }
-        } catch (error) {
-            console.error('Error al obtener el ID del usuario:', error);
-            this.error = 'Token inválido o corrupto.';
-        }
-            }            
-        },
         async crearPedido() {
             try {
                 this.loading = true;

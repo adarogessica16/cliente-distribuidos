@@ -82,8 +82,8 @@ export default {
             isDetallesModalVisible: false
         };
     },
-    async created() {
-        await this.fetchPedidos();
+    mounted() {
+        this.fetchPedidos();
     },
     methods: {
         async fetchPedidos() {
