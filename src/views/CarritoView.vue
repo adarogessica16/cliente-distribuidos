@@ -2,8 +2,6 @@
     <div>
       <b-container v-if="isAuthenticated">
         <NavigationCart/>
-        
-        
       </b-container>
       <b-container v-else>
         <p>No estás autenticado. Por favor, inicia sesión para ver tu carrito.</p>

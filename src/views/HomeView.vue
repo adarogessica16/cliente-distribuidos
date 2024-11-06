@@ -4,6 +4,7 @@
         <b-container v-if="isAuthenticated">
             <h1>Bienvenido al Inicio</h1>
             <p>Contenido protegido que solo se muestra si el usuario está autenticado.</p>
+            <ProductoList/>
             <b-button variant="danger" @click="handleLogout">Cerrar sesión</b-button>
         </b-container>
         <b-container v-else>
@@ -18,8 +19,13 @@
 </template>
 
 <script>
+import ProductoList from '@/components/Producto/ProductoList.vue';
+
 export default {
     name: 'HomeView',
+    components:{
+        ProductoList
+    },
     computed: {
         isAuthenticated() {
             return !!localStorage.getItem('token');

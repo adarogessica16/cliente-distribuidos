@@ -9,11 +9,11 @@ module.exports = defineConfig({
         target: 'http://localhost:8040',
         changeOrigin: true,
       },
-      '/api': {
+      '/api/pedidos': {
         target: 'http://localhost:8040',
         changeOrigin: true,
       },
-      '/api/pedidos': {
+      '/api/resenhas': {
         target: 'http://localhost:8040',
         changeOrigin: true,
       },

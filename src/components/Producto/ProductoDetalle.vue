@@ -6,7 +6,7 @@
             <b-spinner variant="primary" label="Cargando..."></b-spinner>
         </div>
 
-        <div v-else>
+        <div v-else-if="producto">
             <b-card>
                 <b-card-title>{{ producto.nombre }}</b-card-title>
                 <b-card-text>
@@ -22,20 +22,31 @@
 
             <b-button variant="primary" @click="$router.push('/productos')">Volver a Productos</b-button>
             <b-button variant="primary" @click="valorarProducto(producto.id)">Valorar</b-button>
-
+            <b-container>
+                <ReseñasView/>
+            </b-container>
         </div>
-        
+
+        <div v-else>
+            <p>El producto no está disponible.</p>
+        </div>
+
         <b-alert v-if="error" variant="danger" dismissible @dismissed="error = null">
             {{ error }}
         </b-alert>
     </div>
 </template>
 
+
 <script>
 import axios from 'axios';
+import ReseñasView from '../Reseñas/Reseñas.vue';   
 
 export default {
     name: 'ProductoDetalles',
+    components:{
+        ReseñasView
+    },
     data() {
         return {
             producto: null,
@@ -52,6 +63,7 @@ export default {
         async fetchProducto() {
             try {
                 this.loading = true;
+                this.error = null;
                 const token = localStorage.getItem('token');
                 const { id } = this.$route.params; // Obtiene el ID del producto desde la ruta
                 const response = await axios.get(`/api/productos/${id}`, {
