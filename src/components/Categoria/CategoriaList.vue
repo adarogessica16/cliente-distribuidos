@@ -19,59 +19,38 @@
 
             <b-table striped hover :items="categorias" :fields="columns">
                 <template #cell(acciones)="row">
-                    <b-button variant="info" size="sm" @click="editarCategoria(row.item)" class="mr-2">
-                        Editar
-                    </b-button>
-                    <b-button variant="danger" size="sm" @click="confirmarEliminar(row.item)">
-                        Eliminar
-                    </b-button>
+                    <i class="bi bi-pencil-fill me-2" @click="editarCategoria(row.item)"></i>
+                    <i class="bi bi-trash-fill" @click="confirmarEliminar(row.item)"></i>
                 </template>
             </b-table>
 
-            <b-pagination 
-                v-model="currentPage" 
-                :total-rows="totalCategorias" 
-                :per-page="pageSize" 
-                @change="fetchCategorias" 
-            />
+            <b-pagination v-model="currentPage" :total-rows="totalCategorias" :per-page="pageSize"
+                @change="fetchCategorias" />
         </b-container>
 
-        <!-- Modal para Crear/Editar Categoría -->
-        <b-modal 
-            v-model="isModalVisible" 
-            :title="modoEdicion ? 'Editar Categoría' : 'Nueva Categoría'" 
-            @ok="guardarCategoria"
-        >
+        <!-- Modales de Crear/Editar y Confirmación de Eliminación -->
+        <b-modal v-model="isModalVisible" :title="modoEdicion ? 'Editar Categoría' : 'Nueva Categoría'"
+            @ok="guardarCategoria" ok-title="Guardar" cancel-title="Cancelar">
             <b-form>
                 <b-form-group label="Nombre de la Categoría">
-                    <b-form-input 
-                        v-model="categoriaActual.nombre" 
-                        required
-                        placeholder="Ingrese el nombre de la categoría" 
-                    />
+                    <b-form-input v-model="categoriaActual.nombre" required
+                        placeholder="Ingrese el nombre de la categoría" />
                 </b-form-group>
                 <b-form-group label="Descripción">
-                    <b-form-textarea 
-                        v-model="categoriaActual.descripcion" 
-                        placeholder="Ingrese una descripción" 
-                        rows="3" 
-                    />
+                    <b-form-textarea v-model="categoriaActual.descripcion" placeholder="Ingrese una descripción"
+                        rows="3" />
                 </b-form-group>
             </b-form>
         </b-modal>
 
-        <!-- Modal para Confirmar Eliminación -->
-        <b-modal 
-            v-model="isEliminarModalVisible" 
-            title="Confirmar Eliminación" 
-            @ok="eliminarCategoria"
-        >
+        <b-modal v-model="isEliminarModalVisible" title="Confirmar Eliminación" @ok="eliminarCategoria"
+            ok-title="Eliminar" cancel-title="Cancelar">
             ¿Está seguro que desea eliminar la categoría "{{ categoriaAEliminar.nombre }}"?
         </b-modal>
 
-        <b-alert v-if="error" variant="danger" dismissible @dismissed="error = null">
-            {{ error }}
-        </b-alert>
+        <b-toast v-model="toastVisible" :variant="toastVariant" auto-hide-delay="1000" solid>
+            {{ toastMessage }}
+        </b-toast>
     </div>
 </template>
 
@@ -87,7 +66,7 @@ export default {
             error: null,
             currentPage: 1,
             totalCategorias: 0,
-            pageSize: 10,
+            pageSize: 1,
             searchTerm: '',
             columns: [
                 { key: 'nombre', label: 'Nombre' },
@@ -98,7 +77,11 @@ export default {
             categoriaActual: { nombre: '', descripcion: '' },
             categoriaAEliminar: {},
             isModalVisible: false,
-            isEliminarModalVisible: false
+            isEliminarModalVisible: false,
+            toastVisible: false,
+            toastMessage: '',
+            toastVariant: 'danger'
+
         };
     },
     created() {
@@ -106,12 +89,21 @@ export default {
     },
     methods: {
         async fetchCategorias() {
+            if (this.searchTerm.trim() !== '') {
+                await this.buscarCategoria();
+                return;
+            }
+
             try {
                 this.loading = true;
                 this.error = null;
-                const response = await apiService.get(`/categorias/page/${this.currentPage}`);
+                const response = await apiService.get(`/categorias/page/${this.currentPage}?size=${this.pageSize}`);
                 this.categorias = response.data.categorias;
                 this.totalCategorias = response.data.totalElements || response.data.categorias.length;
+                const totalPages = Math.ceil(this.totalCategorias / this.pageSize);
+                if (this.currentPage > totalPages) {
+                    this.currentPage = totalPages;
+                }
             } catch (error) {
                 this.handleError(error, 'No se pudieron cargar las categorías');
             } finally {
@@ -120,10 +112,7 @@ export default {
         },
 
         async buscarCategoria() {
-            if (this.searchTerm.trim() === '') {
-                await this.fetchCategorias();
-                return;
-            }
+            this.currentPage = 1;
             try {
                 const response = await apiService.get(`/categorias/buscar/${this.searchTerm}`);
                 this.categorias = Array.isArray(response.data) ? response.data : [response.data];
@@ -174,15 +163,40 @@ export default {
         },
 
         handleError(error, mensajePredeterminado) {
-            console.error('Error:', error);
-            this.error = error.response?.data?.message || mensajePredeterminado;
+            let mensajeError = mensajePredeterminado;
+
+            if (error.response) {
+                switch (error.response.status) {
+                    case 401:
+                        mensajeError = 'No autorizado para realizar esta acción.';
+                        break;
+                    case 403:
+                        mensajeError = 'No tienes permiso para acceder a este recurso.';
+                        break;
+                    case 404:
+                        mensajeError = 'Recurso no encontrado.';
+                        break;
+                    case 500:
+                        mensajeError = 'Error en el servidor. Intente nuevamente más tarde.';
+                        break;
+                    default:
+                        mensajeError = error.response.data?.message || mensajePredeterminado;
+                        break;
+                }
+            } else {
+                mensajeError = error.message || mensajePredeterminado;
+            }
+
+            this.toastMessage = mensajeError;
+            this.toastVariant = 'danger';
+            this.toastVisible = true;
+        }
+    },
+    watch: {
+        currentPage() {
+            this.fetchCategorias();
         }
     }
 };
 </script>
 
-<style scoped>
-.categorias-container {
-    padding: 20px;
-}
-</style>
