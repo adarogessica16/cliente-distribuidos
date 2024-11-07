@@ -1,7 +1,6 @@
 <template>
     <div class="producto-detalles-container">
         <h1>Detalles del Producto</h1>
-        
         <div v-if="loading" class="text-center">
             <b-spinner variant="primary" label="Cargando..."></b-spinner>
         </div>
@@ -13,7 +12,7 @@
                     <strong>Descripción:</strong> {{ producto.descripcion }}
                 </b-card-text>
                 <b-card-text>
-                    <strong>Precio:</strong> ${{ producto.precio.toFixed(2) }}
+                    <strong>Precio:</strong> ${{ producto.precio ? producto.precio.toFixed(2) : 'No disponible' }}
                 </b-card-text>
                 <b-card-text>
                     <strong>Categoría:</strong> {{ obtenerNombreCategoria(producto.idCategoria) }}
@@ -40,7 +39,7 @@
 
 <script>
 import axios from 'axios';
-import ReseñasView from '../Reseñas/Reseñas.vue';   
+import ReseñasView from '../Reseñas/Reseñas.vue';
 
 export default {
     name: 'ProductoDetalles',
