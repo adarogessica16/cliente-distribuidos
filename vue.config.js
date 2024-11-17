@@ -9,6 +9,10 @@ module.exports = defineConfig({
         target: 'http://localhost:8040',
         changeOrigin: true,
       },
+      '/api': {
+        target: 'http://localhost:8040',
+        changeOrigin: true,
+      },
       '/api/pedidos': {
         target: 'http://localhost:8040',
         changeOrigin: true,

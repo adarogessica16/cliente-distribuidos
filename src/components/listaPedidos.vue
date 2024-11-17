@@ -7,36 +7,22 @@
         </div>
 
         <b-container v-else>
-            <b-row>
-                <b-col>
-                    <b-button variant="primary" @click="mostrarModalCrear" class="mb-3">
-                        Nuevo Pedido
-                    </b-button>
-                </b-col>
-                <b-col>
-                    <b-form-input v-model="searchTerm" placeholder="Buscar pedido..." @input="buscarPedido" />
-                </b-col>
-            </b-row>
-
             <b-table striped hover :items="pedidos" :fields="columns">
                 <template #cell(acciones)="row">
-                    <b-button variant="info" size="sm" @click="verDetallesPedido(row.item)" class="mr-2">
-                        Ver Detalles
+                    <b-button variant="light" size="sm" @click="verDetallesPedido(row.item)" class="mr-2">
+                        <i class="bi bi-eye"></i>
                     </b-button>
                 </template>
             </b-table>
 
             <b-pagination v-model="currentPage" :total-rows="totalPedidos" :per-page="pageSize" @change="fetchPedidos" />
-
          
             <b-alert v-if="!pedidos.length && !loading" variant="info">
                 No tienes pedidos asignados.
             </b-alert>
         </b-container>
 
-        
         <b-modal v-model="isDetallesModalVisible" title="Detalles del Pedido">
-            <p><strong>ID del Pedido:</strong> {{ pedidoActual.id }}</p>
             <p><strong>Fecha:</strong> {{ pedidoActual.fecha }}</p>
             <p><strong>Estado:</strong> {{ pedidoActual.estado ? 'En Proceso' : 'Pendiente' }}</p>
             <p><strong>Dirección:</strong> {{ pedidoActual.direccion }}</p>
@@ -69,7 +55,6 @@ export default {
             currentPage: 0,
             totalPedidos: 0,
             pageSize: 20,
-            searchTerm: '',
             columns: [
                 { key: 'fecha', label: 'Fecha' },
                 { key: 'estado', label: 'Estado' },
@@ -91,7 +76,7 @@ export default {
                 this.loading = true;
                 this.error = null;
                 const token = localStorage.getItem('token');
-                console.log('jwt token:',token);
+                console.log('jwt token:', token);
                 console.log(`Llamando a la URL: /api/pedidos`);
                 const response = await axios.get(`/api/pedidos`, {
                     headers: {

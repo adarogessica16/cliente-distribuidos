@@ -26,7 +26,7 @@
         <b-modal 
         v-model="showEditModal" 
         title="Agregar/Editar Detalle" 
-        @Guardar="saveDetalle"
+        @ok="saveDetalle"
         ok-title="Guardar"
         cancel-title="Cancelar">
             <div>
@@ -43,7 +43,7 @@
         <b-modal 
         v-model="showDeleteModal" 
         title="Confirmar Eliminación" 
-        @eliminar="confirmDelete"
+        @ok="confirmDelete"
         ok-title="Eliminar"
         cancel-title="Cancelar">
             <p>¿Estás seguro de que deseas eliminar este detalle?</p>

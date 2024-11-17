@@ -13,67 +13,57 @@
                     </b-button>
                 </b-col>
                 <b-col>
-                    <b-form-input
-                        v-model="searchTerm"
-                        placeholder="Buscar producto..."
-                        @input="buscarProducto"
-                    />
+                    <b-form-input v-model="searchTerm" placeholder="Buscar producto..."
+                        @input="debouncedBuscarProducto" />
                 </b-col>
             </b-row>
 
             <b-row>
                 <b-col v-for="producto in productosConCategoria" :key="producto.id" md="4" class="mb-4">
-                    <b-card :title="producto.nombre" :sub-title="obtenerNombreCategoria(producto.idCategoria)">
-                        <b-card-text>
-                            {{ producto.descripcion }} <br>
-                            <strong>Precio:</strong> ${{ producto.precio.toFixed(2) }}
-                        </b-card-text>
-                        <b-button variant="info" @click="editarProducto(producto)" class="mr-2">Editar</b-button>
-                        <b-button variant="danger" @click="confirmarEliminar(producto)">Eliminar</b-button>
-                    </b-card>
+                    <b-card>
+                    <template #header>
+                        <router-link :to="{ name: 'ProductoDetalles', params: { id: producto.id } }">
+                            <b-link>{{ producto.nombre }}</b-link>
+                        </router-link>
+                    </template>
+                    <b-card-sub-title>{{ obtenerNombreCategoria(producto.idCategoria) }}</b-card-sub-title>
+                    <b-card-text>
+                        {{ producto.descripcion }} <br>
+                        <strong>Precio:</strong> {{ producto.precio ? producto.precio.toFixed(2) : 'No disponible' }}
+                    </b-card-text>
+                    <div>
+                        <b-button variant="light" @click="añadirCarrito(producto)" class="mr-2"><i class="bi bi-cart4"></i></b-button>
+                        <i class="bi bi-pencil-fill me-2" @click="editarProducto(producto)"></i>
+                        <i class="bi bi-trash-fill" @click="confirmarEliminar(producto)"></i>
+                    </div>
+                </b-card>
+
                 </b-col>
             </b-row>
 
-            <b-pagination 
-                v-model="currentPage" 
-                :total-rows="totalProductos" 
-                :per-page="pageSize" 
-                @change="fetchProductos"
-            />
+            <b-pagination v-model="currentPage" :total-rows="totalProductos" :per-page="pageSize"
+                @change="fetchProductos" />
+
         </b-container>
 
         <!-- Modal para Crear/Editar Producto -->
-        <b-modal v-model="isModalVisible" :title="modoEdicion ? 'Editar Producto' : 'Nuevo Producto'" @ok="guardarProducto" @show="onShowModal">
+        <b-modal v-model="isModalVisible" :title="modoEdicion ? 'Editar Producto' : 'Nuevo Producto'"
+            @ok="guardarProducto" @show="onShowModal" ok-title="Guardar" cancel-title="Cancelar">
             <b-form>
                 <b-form-group label="Nombre del Producto">
-                    <b-form-input 
-                        v-model="productoActual.nombre" 
-                        required
-                        placeholder="Ingrese el nombre del producto"
-                    />
+                    <b-form-input v-model="productoActual.nombre" required
+                        placeholder="Ingrese el nombre del producto" />
                 </b-form-group>
                 <b-form-group label="Descripción">
-                    <b-form-textarea 
-                        v-model="productoActual.descripcion"
-                        placeholder="Ingrese una descripción"
-                        rows="3"
-                    />
+                    <b-form-textarea v-model="productoActual.descripcion" placeholder="Ingrese una descripción"
+                        rows="3" />
                 </b-form-group>
                 <b-form-group label="Precio">
-                    <b-form-input 
-                        v-model.number="productoActual.precio"
-                        type="number"
-                        step="0.01"
-                        required
-                        placeholder="Ingrese el precio"
-                    />
+                    <b-form-input v-model.number="productoActual.precio" type="number" step="0.01" required
+                        placeholder="Ingrese el precio" />
                 </b-form-group>
                 <b-form-group label="Categoría">
-                    <b-form-select 
-                        v-model="productoActual.idCategoria"
-                        :options="categoriasOptions"
-                        required
-                    >
+                    <b-form-select v-model="productoActual.idCategoria" :options="categoriasOptions" required>
                         <template #first>
                             <b-form-select-option :value="null">Seleccione una categoría</b-form-select-option>
                         </template>
@@ -83,18 +73,20 @@
         </b-modal>
 
         <!-- Modal para Confirmar Eliminación -->
-        <b-modal v-model="isEliminarModalVisible" title="Confirmar Eliminación" @ok="eliminarProducto">
+        <b-modal v-model="isEliminarModalVisible" title="Confirmar Eliminación" @ok="eliminarProducto"
+            ok-title="Eliminar" cancel-title="Cancelar">
             ¿Está seguro que desea eliminar el producto "{{ productoAEliminar.nombre }}"?
         </b-modal>
 
-        <b-alert v-if="error" variant="danger" dismissible @dismissed="error = null">
-            {{ error }}
-        </b-alert>
+        <b-toast v-model="toastVisible" :variant="toastVariant" auto-hide-delay="1000" solid>
+            {{ toastMessage }}
+        </b-toast>
     </div>
 </template>
 
 <script>
 import { apiService } from '@/services/apiService';
+import { debounce } from 'lodash';
 
 export default {
     name: 'ProductoList',
@@ -102,11 +94,12 @@ export default {
         return {
             productos: [],
             categorias: [],
+            items: [],
             loading: true,
             error: null,
             currentPage: 1,
             totalProductos: 0,
-            pageSize: 10,
+            pageSize: 1,
             searchTerm: '',
             modoEdicion: false,
             productoActual: {
@@ -117,7 +110,10 @@ export default {
             },
             productoAEliminar: {},
             isModalVisible: false,
-            isEliminarModalVisible: false
+            isEliminarModalVisible: false,
+            toastVisible: false,
+            toastMessage: '',
+            toastVariant: 'danger'
         };
     },
     computed: {
@@ -137,16 +133,17 @@ export default {
     async mounted() {
         await this.fetchCategorias();
         await this.fetchProductos();
+        this.debouncedBuscarProducto = debounce(this.buscarProducto, 500);
     },
     methods: {
         async fetchProductos() {
             try {
                 this.loading = true;
                 this.error = null;
-                const response = await apiService.get(`/productos/page/${this.currentPage}`);
-                console.log("llamada api", response);
+                const response = await apiService.get(`/productos/page/${this.currentPage}?size=${this.pageSize}`);
                 this.productos = response.data.productos;
                 this.totalProductos = response.data.totalElements || response.data.productos.length;
+
             } catch (error) {
                 this.handleError(error, 'No se pudieron cargar los productos');
             } finally {
@@ -157,8 +154,7 @@ export default {
         async fetchCategorias() {
             try {
                 const response = await apiService.get('/categorias');
-                this.categorias = Array.isArray(response.data) ? response.data : 
-                                 response.data.categorias ? response.data.categorias : [];
+                this.categorias = Array.isArray(response.data) ? response.data : response.data.categorias || [];
             } catch (error) {
                 this.handleError(error, 'Error al cargar las categorías');
             }
@@ -170,6 +166,7 @@ export default {
         },
 
         async buscarProducto() {
+            this.currentPage = 1;
             if (this.searchTerm.trim() === '') {
                 await this.fetchProductos();
                 return;
@@ -182,6 +179,7 @@ export default {
                 this.handleError(error, 'Error al buscar productos');
             }
         },
+
 
         mostrarModalCrear() {
             this.modoEdicion = false;
@@ -196,7 +194,7 @@ export default {
 
         editarProducto(producto) {
             this.modoEdicion = true;
-            this.productoActual = { 
+            this.productoActual = {
                 ...producto,
                 idCategoria: producto.idCategoria
             };
@@ -251,9 +249,59 @@ export default {
         },
 
         handleError(error, mensajePredeterminado) {
-            console.error('Error:', error);
-            this.error = error.response?.data?.message || mensajePredeterminado;
+            let mensajeError = mensajePredeterminado;
+
+            if (error.response) {
+                switch (error.response.status) {
+                    case 401:
+                        mensajeError = 'No autorizado para realizar esta acción.';
+                        break;
+                    case 403:
+                        mensajeError = 'No tienes permiso para acceder a este recurso.';
+                        break;
+                    case 404:
+                        mensajeError = 'Recurso no encontrado.';
+                        break;
+                    case 500:
+                        mensajeError = 'Error en el servidor. Intente nuevamente más tarde.';
+                        break;
+                    default:
+                        mensajeError = error.response.data?.message || mensajePredeterminado;
+                        break;
+                }
+            } else {
+                mensajeError = error.message || mensajePredeterminado;
+            }
+
+            this.toastMessage = mensajeError;
+            this.toastVariant = 'danger';
+            this.toastVisible = true;
+        },
+        añadirCarrito(producto) {
+            console.log('Añadiendo producto al carrito:', producto);
+            const productoExistente = this.items.find(item => item.id_Producto === producto.id);
+
+            if (productoExistente) {
+                productoExistente.cantidad += 1;
+            } else {
+                this.items.push({
+                    id_Producto: producto.id,
+                    nombre: producto.nombre,
+                    descripcion: producto.descripcion,
+                    precio: producto.precio,
+                    cantidad: 1
+                });
+            }
+            localStorage.setItem('carrito', JSON.stringify(this.items));
+            console.log('Carrito actualizado:', JSON.parse(localStorage.getItem('carrito')));
+        },
+    },
+    watch: {
+        currentPage() {
+            this.fetchProductos();
         }
     }
+
+
 };
 </script>

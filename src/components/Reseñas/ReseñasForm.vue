@@ -27,10 +27,10 @@
   </template>
   
   <script>
-  import axios from 'axios';
-  import StarRating from 'vue3-star-ratings';
-  
-  export default {
+import axios from 'axios';
+import StarRating from 'vue3-star-ratings';
+
+export default {
     name: 'ReseñasForm',
     components: {
         StarRating
@@ -38,62 +38,52 @@
     data() {
         return {
             resena: {
-                Id_Usuario: null,  // Se puede asignar en el backend si el usuario está autenticado
-                Id_Producto: null,  // Será asignado desde los parámetros de la ruta
+                idProducto: this.$route.params.idProducto,  
                 calificacion: 0,
                 comentario: '',
-                fecha: new Date().toISOString().substr(0, 10)  // Fecha actual
+                fecha: new Date().toISOString().substr(0, 10)
             },
             loading: false,
             error: null
         };
     },
-    created() {
-        this.resena.Id_Producto = this.$route.params.idProducto;  // Captura el ID del producto desde los parámetros de la ruta
-    },
     methods: {
-      async crearResena() {
-          try {
-              this.loading = true;
-              this.error = null;
-              console.log('Reseña antes de envío:', this.resena);
-  
-              // Redondear la calificación a un número entero
-              this.resena.calificacion = Math.round(this.resena.calificacion);
-              console.log('Calificación redondeada:', this.resena.calificacion);
-  
-              const token = localStorage.getItem('token');
-              if (!token) {
-                  this.error = 'No se encontró un token de autenticación. Inicia sesión nuevamente.';
-                  console.error('No se encontró token en localStorage');
-                  return;
-              }
-  
-              console.log('Token encontrado:', token);
-  
-              const response = await axios.post('/api/resenhas', this.resena, {
-                  headers: {
-                      'Content-Type': 'application/json',
-                      Authorization: `Bearer ${token}`, 
-                  },
-              });
-  
-              console.log('Respuesta de la API:', response.data);
-              this.$router.push('/productos'); 
-          } catch (error) {
-              this.error = error.response?.data?.message || 'Error al enviar la reseña';
-              console.error('Error al enviar la reseña:', error.response ? error.response.data : error);
-          } finally {
-              this.loading = false;
-          }
-      }
+        async crearResena() {
+    try {
+        this.loading = true;
+        this.error = null;
+        console.log('Reseña antes de envío:', this.resena); 
+        this.resena.calificacion = Math.round(this.resena.calificacion);
+        console.log('Calificación redondeada:', this.resena.calificacion);
+        console.log('ID del producto recibido:', this.$route.params.idProducto);
+        this.resena.Id_Producto = this.$route.params.idProducto;
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            this.error = 'No se encontró un token de autenticación. Inicia sesión nuevamente.';
+            console.error('No se encontró token en localStorage');
+            return;
+        }
+
+        console.log('Token encontrado:', token);
+
+        const response = await axios.post('/api/resenhas', this.resena, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        console.log('Respuesta de la API:', response.data);
+        this.$router.push('/productos'); 
+    } catch (error) {
+        this.error = error.response?.data?.message || 'Error al enviar la reseña';
+        console.error('Error al enviar la reseña:', error.response ? error.response.data : error);
+    } finally {
+        this.loading = false;
     }
-  };
-  </script>
-  
-  <style scoped>
-  .resena-form-container {
-      padding: 20px;
-  }
-  </style>
-  
+}
+
+    }
+};
+</script>

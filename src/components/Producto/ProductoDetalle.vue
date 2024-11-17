@@ -13,7 +13,7 @@
                     <strong>Descripción:</strong> {{ producto.descripcion }}
                 </b-card-text>
                 <b-card-text>
-                    <strong>Precio:</strong> ${{ producto.precio.toFixed(2) }}
+                    <strong>Precio:</strong> {{ producto.precio.toFixed(2) }}
                 </b-card-text>
                 <b-card-text>
                     <strong>Categoría:</strong> {{ obtenerNombreCategoria(producto.idCategoria) }}

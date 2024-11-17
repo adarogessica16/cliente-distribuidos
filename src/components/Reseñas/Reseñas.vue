@@ -3,8 +3,7 @@
       <b-card title="Reseñas de Productos" sub-title="">
         <b-card-text v-if="loading">Cargando reseñas...</b-card-text>
         <b-card-text v-else-if="error">{{ error }}</b-card-text>
-        
-        <!-- Muestra las reseñas si están disponibles -->
+  
         <div v-else>
           <b-card-group>
             <b-card v-for="reseña in reseñas" :key="reseña.Id_Reseña">

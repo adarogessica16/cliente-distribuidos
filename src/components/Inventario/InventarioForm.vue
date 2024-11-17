@@ -35,13 +35,13 @@
                         <b-col>
                             <b-form-group label="Producto">
                                 <b-form-select v-model="newDetalle.idProducto" :options="productos"
-                                    required></b-form-select>
+                                    ></b-form-select>
                             </b-form-group>
                         </b-col>
                         <b-col>
                             <b-form-group label="Cantidad">
                                 <b-form-input v-model="newDetalle.cantidad" type="number" min="1"
-                                    required></b-form-input>
+                                    ></b-form-input>
                             </b-form-group>
                         </b-col>
                         <b-col class="d-flex align-items-end">
@@ -96,8 +96,7 @@ export default {
             fields: [
                 { key: 'nombre', label: 'Nombre' },
                 { key: 'fecha', label: 'Fecha', formatter: this.formatDate },
-                { key: 'detalles', label: 'Detalles' },
-                { key: 'actions', label: 'Acciones' },
+                { key: 'detalles', label: 'Detalles' }
             ],
             detalleFields: [
                 { key: 'producto', label: 'Producto' },

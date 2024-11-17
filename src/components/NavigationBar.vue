@@ -7,6 +7,7 @@
             <b-navbar-nav>
                 <b-nav-item to="/" exact>Inicio</b-nav-item>
                 <b-nav-item to="/categorias">Categorías</b-nav-item>
+                <b-nav-item to="/inventarios">Inventarios</b-nav-item>
                 <b-nav-item to="/pedidos">Carrito</b-nav-item>
                 <b-nav-item to="/obtener-pedidos">Pedidos</b-nav-item>
                 <b-nav-item v-if="!isAuthenticated" to="/login">Iniciar Sesión</b-nav-item>

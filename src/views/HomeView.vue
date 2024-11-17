@@ -3,9 +3,7 @@
     <div>
         <b-container v-if="isAuthenticated">
             <h1>Bienvenido al Inicio</h1>
-            <p>Contenido protegido que solo se muestra si el usuario está autenticado.</p>
             <ProductoList/>
-            <b-button variant="danger" @click="handleLogout">Cerrar sesión</b-button>
         </b-container>
         <b-container v-else>
             <b-alert variant="warning">
