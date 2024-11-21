@@ -12,6 +12,8 @@ import ReseñasForm from '@/components/Reseñas/ReseñasForm.vue';
 import InventarioDetalles from '@/components/Inventario/InventarioDetalles.vue';
 import InventarioForm from '@/components/Inventario/InventarioForm.vue';
 import FormasPagoView from '@/views/FormasPagoView.vue';
+import RegisterView from '@/views/RegisterView.vue';
+
 const routes = [
   {
     path: '/',
@@ -24,6 +26,12 @@ const routes = [
     name: 'Login',
     component: LoginView,
     meta: { requiresAuth: false }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: RegisterView,  // Ruta para el registro
+    meta: { requiresAuth: false } // No requiere autenticación para acceder
   },
   {
     path: '/categorias',
@@ -86,11 +94,17 @@ const routes = [
     component: FormasPagoView,
     meta: { requiresAuth: true }
   },
+  {
+    path: '/editar-resena/:idResena/:idProducto',
+    name: 'resena-edit',
+    component: ReseñasForm,  
+    meta: { requiresAuth: true }  
+  }  
   
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/cliente-distribuidos/'),
   routes
 });
 

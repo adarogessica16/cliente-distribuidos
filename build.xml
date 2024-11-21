@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="vue-proyecto" default="war" basedir=".">
+    
+    <!-- Define la ubicación del archivo WAR -->
+    <property name="war.dest" location="build/cliente-distribuidos.war"/>
+    
+    <!-- Crea el archivo WAR -->
+    <target name="war">
+        <mkdir dir="build/war"/>
+        <war destfile="${war.dest}" needxmlfile="false">
+            <fileset dir="dist"/> <!-- Archivos estáticos generados por Vue -->
+        </war>
+    </target>
+</project>

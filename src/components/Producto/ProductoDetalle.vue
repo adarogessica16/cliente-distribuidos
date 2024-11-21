@@ -23,7 +23,7 @@
             <b-button variant="primary" @click="$router.push('/productos')">Volver a Productos</b-button>
             <b-button variant="primary" @click="valorarProducto(producto.id)">Valorar</b-button>
             <b-container>
-                <ReseñasView/>
+                <ReseñasView :producto-id="producto.id"/>
             </b-container>
         </div>
 

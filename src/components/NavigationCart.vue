@@ -2,13 +2,10 @@
   <div>
     <b-nav class="custom-nav" align="center">
       <b-nav-item class="custom-nav-item">
-        1. Carrito de compras
+        <router-link class="custom-nav-item" to="/crear-pedido">1. Detalles de envío</router-link>
       </b-nav-item>
       <b-nav-item class="custom-nav-item">
-        <router-link class="custom-nav-item" to="/crear-pedido">2. Detalles de envío</router-link>
-      </b-nav-item>
-      <b-nav-item class="custom-nav-item">
-        <router-link class="custom-nav-item" to="/formas-pago">3. Forma de pago</router-link>
+        <router-link class="custom-nav-item" to="/formas-pago">2. Forma de pago</router-link>
       </b-nav-item>
     </b-nav>
   </div>
